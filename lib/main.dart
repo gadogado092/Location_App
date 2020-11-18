@@ -12,12 +12,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Location App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Location App'),
     );
   }
 }
@@ -50,43 +50,45 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<UserLocation>(
-      create: (context) => LocationService().locationStream,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                TextFormField(
-                  controller: _latitudeController,
-                  decoration: InputDecoration(
-                      hintText: "Latitude", labelText: "Latitude"),
-                ),
-                TextFormField(
-                  controller: _longitudeController,
-                  decoration: InputDecoration(
-                      hintText: "Longitude", labelText: "Longitude"),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    debugPrint("====" + _latitudeController.text.toString());
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    prefs.setDouble("lat",
-                        double.parse(_latitudeController.text.toString()));
-                    prefs.setDouble("long",
-                        double.parse(_longitudeController.text.toString()));
-                  },
-                  child: Text("Set LatLong"),
-                ),
-                LocationView()
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              TextFormField(
+                controller: _latitudeController,
+                maxLines: null,
+                decoration: InputDecoration(
+                    hintText: "Latitude", labelText: "Latitude"),
+              ),
+              TextFormField(
+                controller: _longitudeController,
+                decoration: InputDecoration(
+                    hintText: "Longitude", labelText: "Longitude"),
+              ),
+              RaisedButton(
+                onPressed: () async {
+                  debugPrint("====before="+_latitudeController.text.toString());
+                  debugPrint("====after="+_latitudeController.text.toString().replaceAll("\n", "\\n"));
+                  // debugPrint("====" + _latitudeController.text.toString());
+                  // SharedPreferences prefs =
+                  //     await SharedPreferences.getInstance();
+                  // prefs.setDouble(
+                  //     "lat", double.parse(_latitudeController.text.toString()));
+                  // prefs.setDouble("long",
+                  //     double.parse(_longitudeController.text.toString()));
+                },
+                child: Text("Set LatLong"),
+              ),
+              StreamProvider<UserLocation>(
+                  create: (context) => LocationService().locationStream,
+                  child: LocationView())
+            ],
           ),
         ),
       ),
@@ -114,35 +116,44 @@ class LocationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var userLocation = Provider.of<UserLocation>(context);
+
     return Row(
       children: [
         Container(
-            width: 16,
-            height: 16,
+            width: 32,
+            height: 32,
             child: CircularProgressIndicator(
               strokeWidth: 2.0,
             )),
         Expanded(
-                  child: Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 16.0, top: 16),
                 child: SelectableText(
                     'Location Now= ${userLocation?.latitude}, ${userLocation?.longitude}'),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 16.0, top: 16),
                 child: Text(
-                    "Location Office = ${userLocation.latitudeOffice}, ${userLocation.longitudeOffice}"),
+                    "Location Office = ${userLocation?.latitudeOffice}, ${userLocation?.longitudeOffice}"),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text("Distance = ${userLocation.distance}"),
+                padding: const EdgeInsets.only(left: 16.0, top: 16),
+                child: Text("Distance = ${userLocation?.distance}"),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text("Address Now = ${userLocation.address}"),
+                padding: const EdgeInsets.only(left: 16.0, top: 16),
+                child: Text("Distance Geo Locator= ${userLocation?.distance2}"),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, top: 16),
+                child: Text("Address Now = ${userLocation?.address}"),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, top: 16),
+                child: Text("Accuracy = ${userLocation?.accuracy}"),
               ),
             ],
           ),

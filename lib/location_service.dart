@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:geolocator/geolocator.dart' as GeoLocator;
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geocoder/geocoder.dart';
@@ -41,13 +42,21 @@ class LocationService {
                     var first = addresses.first;
                     var dis = calculateDistance(locationData.latitude,
                         locationData.longitude, lat, long);
+                    double distanceInMeters =
+                        GeoLocator.Geolocator.distanceBetween(
+                            locationData.latitude,
+                            locationData.longitude,
+                            lat,
+                            long);
+
                     _locationController.add(UserLocation(
                         latitude: locationData.latitude,
                         longitude: locationData.longitude,
                         latitudeOffice: lat ?? 0.0,
                         longitudeOffice: long ?? 0.0,
-                        address:
-                            '${first.locality}, ${first.adminArea},${first.subLocality}, ${first.subAdminArea},${first.addressLine}, ${first.featureName},${first.thoroughfare}, ${first.subThoroughfare}',
+                        accuracy: locationData.accuracy,
+                        distance2: distanceInMeters,
+                        address: '${first.addressLine}',
                         distance: dis));
                   }
                 });
@@ -69,13 +78,17 @@ class LocationService {
                 var first = addresses.first;
                 var dis = calculateDistance(
                     locationData.latitude, locationData.longitude, lat, long);
+                double distanceInMeters = GeoLocator.Geolocator.distanceBetween(
+                    locationData.latitude, locationData.longitude, lat, long);
+
                 _locationController.add(UserLocation(
                     latitude: locationData.latitude,
                     longitude: locationData.longitude,
                     latitudeOffice: lat ?? 0.0,
                     longitudeOffice: long ?? 0.0,
-                    address:
-                        '${first.locality}, ${first.adminArea},${first.subLocality}, ${first.subAdminArea},${first.addressLine}, ${first.featureName},${first.thoroughfare}, ${first.subThoroughfare}',
+                    accuracy: locationData.accuracy,
+                    address: '${first.addressLine}',
+                    distance2: distanceInMeters,
                     distance: dis));
               }
             });
@@ -105,6 +118,8 @@ class UserLocation {
   final double latitudeOffice;
   final double longitudeOffice;
   final double distance;
+  final double distance2;
+  final double accuracy;
   final String address;
 
   UserLocation(
@@ -113,6 +128,8 @@ class UserLocation {
       this.latitudeOffice = 0.0,
       this.longitudeOffice = 0.0,
       this.distance = 0.0,
+      this.distance2 = 0.0,
+      this.accuracy = 0.0,
       this.address});
 }
 
